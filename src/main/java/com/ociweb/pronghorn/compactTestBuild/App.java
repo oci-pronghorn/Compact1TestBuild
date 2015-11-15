@@ -8,15 +8,15 @@ import java.io.RandomAccessFile;
 import java.util.Arrays;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
-
-import com.ociweb.pronghorn.components.compression.DeflateCompressionComponent.DeflateCompressionStage;
-import com.ociweb.pronghorn.components.compression.GzipCompressionComponent.GzipCompressionStage;
-import com.ociweb.pronghorn.components.compression.KanziCompressionComponent.KanziCompressionStage;
-import com.ociweb.pronghorn.components.compression.XZCompressionComponent.XZCompressionStage;
-import com.ociweb.pronghorn.components.decompression.DeflateDecompressionComponent.DeflateDecompressionStage;
-import com.ociweb.pronghorn.components.decompression.GzipDecompressionComponent.GzipDecompressionStage;
-import com.ociweb.pronghorn.components.decompression.KanziDecompressionComponent.KanziDecompressionStage;
-import com.ociweb.pronghorn.components.decompression.XZDecompressionComponent.XZDecompressionStage;
+//
+//import com.ociweb.pronghorn.components.compression.DeflateCompressionComponent.DeflateCompressionStage;
+//import com.ociweb.pronghorn.components.compression.GzipCompressionComponent.GzipCompressionStage;
+//import com.ociweb.pronghorn.components.compression.KanziCompressionComponent.KanziCompressionStage;
+//import com.ociweb.pronghorn.components.compression.XZCompressionComponent.XZCompressionStage;
+//import com.ociweb.pronghorn.components.decompression.DeflateDecompressionComponent.DeflateDecompressionStage;
+//import com.ociweb.pronghorn.components.decompression.GzipDecompressionComponent.GzipDecompressionStage;
+//import com.ociweb.pronghorn.components.decompression.KanziDecompressionComponent.KanziDecompressionStage;
+//import com.ociweb.pronghorn.components.decompression.XZDecompressionComponent.XZDecompressionStage;
 import com.ociweb.pronghorn.pipe.Pipe;
 import com.ociweb.pronghorn.pipe.PipeConfig;
 import com.ociweb.pronghorn.pipe.RawDataSchema;
@@ -116,76 +116,76 @@ public class App {
         
     }
 
-    private static void compressionTest()  throws IOException {
-        int largestBlock = testSize;
-        final ZeroCopyByteArrayOutputStream outputStream = new ZeroCopyByteArrayOutputStream(largestBlock);
-        
-        File tempFile = fileFullOfTestData();
-        
-        
-        long[] times = new long[200]; //guess on size
-        int timeIdx = 0;
-                        
-        int p = largestPipe;
-             
-            
-            int blockSize = largestBlock/2;
-            
-            GraphManager gm = new GraphManager();
-            
-            PipeConfig<RawDataSchema> config = new PipeConfig<RawDataSchema>(RawDataSchema.instance, p, blockSize);
-            Pipe<RawDataSchema> loadedDataPipe = new Pipe<RawDataSchema>(config);
-            Pipe<RawDataSchema> compressedDataPipe = new Pipe<RawDataSchema>(config.grow2x());
-            Pipe<RawDataSchema> validateDataPipe = new Pipe<RawDataSchema>(config.grow2x());
-                                                
-            
-            
-            new FileBlobReadStage(gm, new RandomAccessFile(tempFile, "r"), loadedDataPipe);   
-            
-            //Zip and deflate are not working.
-            //TODO this does compile however this example does not work. instead it hangs on run
-            new XZCompressionStage(gm, loadedDataPipe, compressedDataPipe,1);
-            new XZDecompressionStage(gm, compressedDataPipe, validateDataPipe);
-            
-//            new KanziCompressionStage(gm, loadedDataPipe, compressedDataPipe, "HUFFMAN","SNAPPY");
-  //          new KanziDecompressionStage(gm, compressedDataPipe, validateDataPipe);
-            
-            outputStream.reset();
-            new ToOutputStreamStage(gm, validateDataPipe, outputStream, false);
-            
-                        
-           // GraphManager.enableBatching(gm);//lower contention over head and tail            
-            MonitorConsoleStage.attach(gm);
-            
-            ThreadPerStageScheduler scheduler = new ThreadPerStageScheduler(gm);
-            
-            long startTime = System.currentTimeMillis();
-            scheduler.startup();        
-            
-            scheduler.awaitTermination(timeoutSeconds, TimeUnit.SECONDS);
-            long duration = System.currentTimeMillis()-startTime;
-            
-            times[timeIdx++] = duration;
-            
-            validateReadData(outputStream);
-            
-            if (duration>(timeoutSeconds*1000)) {
-                System.err.println("unable to get duration, timedout");
-            } else {                
-                int mbytesPerSecond = mBytesPerSecond(duration);                
-                System.out.println("BLOB READ: pipeLength:"+p+" blockSize:"+(blockSize/1024)+"k  duration:"+duration+" totalBlobRingSize:"+loadedDataPipe.sizeOfBlobRing+" MB/S:"+mbytesPerSecond);               
-            }
-            if (p>200) {
-                p-=100;
-            } else {
-                if (p>30) {
-                    p-=10;
-                } else {            
-                    p-=2;
-                }
-            }
- 
-    }
+//    private static void compressionTest()  throws IOException {
+//        int largestBlock = testSize;
+//        final ZeroCopyByteArrayOutputStream outputStream = new ZeroCopyByteArrayOutputStream(largestBlock);
+//        
+//        File tempFile = fileFullOfTestData();
+//        
+//        
+//        long[] times = new long[200]; //guess on size
+//        int timeIdx = 0;
+//                        
+//        int p = largestPipe;
+//             
+//            
+//            int blockSize = largestBlock/2;
+//            
+//            GraphManager gm = new GraphManager();
+//            
+//            PipeConfig<RawDataSchema> config = new PipeConfig<RawDataSchema>(RawDataSchema.instance, p, blockSize);
+//            Pipe<RawDataSchema> loadedDataPipe = new Pipe<RawDataSchema>(config);
+//            Pipe<RawDataSchema> compressedDataPipe = new Pipe<RawDataSchema>(config.grow2x());
+//            Pipe<RawDataSchema> validateDataPipe = new Pipe<RawDataSchema>(config.grow2x());
+//                                                
+//            
+//            
+//            new FileBlobReadStage(gm, new RandomAccessFile(tempFile, "r"), loadedDataPipe);   
+//            
+//            //Zip and deflate are not working.
+//            //TODO this does compile however this example does not work. instead it hangs on run
+//            new XZCompressionStage(gm, loadedDataPipe, compressedDataPipe,1);
+//            new XZDecompressionStage(gm, compressedDataPipe, validateDataPipe);
+//            
+////            new KanziCompressionStage(gm, loadedDataPipe, compressedDataPipe, "HUFFMAN","SNAPPY");
+//  //          new KanziDecompressionStage(gm, compressedDataPipe, validateDataPipe);
+//            
+//            outputStream.reset();
+//            new ToOutputStreamStage(gm, validateDataPipe, outputStream, false);
+//            
+//                        
+//           // GraphManager.enableBatching(gm);//lower contention over head and tail            
+//            MonitorConsoleStage.attach(gm);
+//            
+//            ThreadPerStageScheduler scheduler = new ThreadPerStageScheduler(gm);
+//            
+//            long startTime = System.currentTimeMillis();
+//            scheduler.startup();        
+//            
+//            scheduler.awaitTermination(timeoutSeconds, TimeUnit.SECONDS);
+//            long duration = System.currentTimeMillis()-startTime;
+//            
+//            times[timeIdx++] = duration;
+//            
+//            validateReadData(outputStream);
+//            
+//            if (duration>(timeoutSeconds*1000)) {
+//                System.err.println("unable to get duration, timedout");
+//            } else {                
+//                int mbytesPerSecond = mBytesPerSecond(duration);                
+//                System.out.println("BLOB READ: pipeLength:"+p+" blockSize:"+(blockSize/1024)+"k  duration:"+duration+" totalBlobRingSize:"+loadedDataPipe.sizeOfBlobRing+" MB/S:"+mbytesPerSecond);               
+//            }
+//            if (p>200) {
+//                p-=100;
+//            } else {
+//                if (p>30) {
+//                    p-=10;
+//                } else {            
+//                    p-=2;
+//                }
+//            }
+// 
+//    }
 
     private static long fileBlobReadTest() throws IOException {
         final ZeroCopyByteArrayOutputStream outputStream = new ZeroCopyByteArrayOutputStream(testSize);
