@@ -208,7 +208,7 @@ public class App {
             PipeConfig<RawDataSchema> config = new PipeConfig<RawDataSchema>(RawDataSchema.instance, p, blockSize);
             Pipe<RawDataSchema> loadedDataPipe = new Pipe<RawDataSchema>(config);
                                                 
-            new FileBlobReadStage(gm, new RandomAccessFile(tempFile, "r"), loadedDataPipe);            
+            new FileBlobReadStage(gm, new RandomAccessFile(tempFile, "r"), tempFile.getPath(), loadedDataPipe);            
             outputStream.reset();
             new ToOutputStreamStage(gm, loadedDataPipe, outputStream, false);
             
@@ -308,7 +308,7 @@ public class App {
             tempFile.deleteOnExit();
             
             PronghornStage s1 = new ByteArrayProducerStage(gm, rawData, loadedDataPipe);        
-            PronghornStage s2 = new FileBlobWriteStage(gm, loadedDataPipe, new RandomAccessFile(tempFile,"rw"));  //NOTE: use rwd/rws to sync flush with every write (much slower)
+            PronghornStage s2 = new FileBlobWriteStage(gm, loadedDataPipe, new RandomAccessFile(tempFile,"rw"), tempFile.getPath());  //NOTE: use rwd/rws to sync flush with every write (much slower)
             
             GraphManager.enableBatching(gm);//lower contention over head and tail
          //   MonitorConsoleStage.attach(gm);
