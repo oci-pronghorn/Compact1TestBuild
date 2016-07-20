@@ -208,7 +208,7 @@ public class App {
             PipeConfig<RawDataSchema> config = new PipeConfig<RawDataSchema>(RawDataSchema.instance, p, blockSize);
             Pipe<RawDataSchema> loadedDataPipe = new Pipe<RawDataSchema>(config);
                                                 
-            new FileBlobReadStage(gm, new RandomAccessFile(tempFile, "r"), tempFile.getPath(), loadedDataPipe);            
+            new FileBlobReadStage(gm, tempFile.getPath(), loadedDataPipe);            
             outputStream.reset();
             new ToOutputStreamStage(gm, loadedDataPipe, outputStream, false);
             
